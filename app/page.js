@@ -6,8 +6,6 @@ import { useQueries } from '@tanstack/react-query';
 export default function Home() {
   const [buckets, setBuckets] = useState([]);
   const [selectedBucket, setSelectedBucket] = useState(null);
-  const [currentBucketId, setCurrentBucketId] = useState(null);
-  const [isChangingBucket, setIsChangingBucket] = useState(false);
   const [newBucketName, setNewBucketName] = useState('');
   const [newQuery, setNewQuery] = useState('');
   const [showAddBucket, setShowAddBucket] = useState(false);
@@ -19,29 +17,12 @@ export default function Home() {
   const [minLikes, setMinLikes] = useState(0);
   const [minRetweets, setMinRetweets] = useState(0);
 
-  // Handle bucket change with cleanup
-  useEffect(() => {
-    if (selectedBucket && selectedBucket.id !== currentBucketId) {
-      console.log('🔄 Bucket changed:', currentBucketId, '→', selectedBucket.id);
-      setIsChangingBucket(true);
-      setCurrentBucketId(selectedBucket.id);
-
-      // Small delay to ensure old queries are cleared
-      const timer = setTimeout(() => {
-        setIsChangingBucket(false);
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [selectedBucket, currentBucketId]);
-
   // Load buckets from server on mount
   useEffect(() => {
     fetch('/api/buckets')
       .then(res => res.json())
       .then(data => {
         setBuckets(data);
-        // Auto-select first bucket if available
         if (data.length > 0) setSelectedBucket(data[0]);
       })
       .catch(err => console.error('Failed to load buckets:', err));
@@ -67,19 +48,14 @@ export default function Home() {
   };
 
   // Fetch tweets for all queries in selected bucket
-  // Only create queries when we're not changing buckets
-  const queries = selectedBucket && !isChangingBucket && currentBucketId === selectedBucket.id
-    ? selectedBucket.queries.map((query) => ({
-        queryKey: ['tweets', currentBucketId, query, startDate, endDate],
+  const queries = selectedBucket?.queries.length > 0
+    ? selectedBucket.queries.map((query, index) => ({
+        queryKey: ['tweets', selectedBucket.id, index, query, startDate, endDate],
         queryFn: async () => {
-          console.log('📡 Fetching for bucket', currentBucketId, 'query:', query.substring(0, 50) + '...');
           const res = await fetch(buildApiUrl(query));
           if (!res.ok) throw new Error('Failed to fetch');
           return res.json();
         },
-        enabled: true,
-        staleTime: 0, // Always fetch fresh
-        cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
       }))
     : [];
 
@@ -105,11 +81,7 @@ export default function Home() {
       ...selectedBucket,
       queries: [...selectedBucket.queries, newQuery],
     };
-    setBuckets(
-      buckets.map((b) =>
-        b.id === selectedBucket.id ? updatedBucket : b
-      )
-    );
+    setBuckets(buckets.map((b) => b.id === selectedBucket.id ? updatedBucket : b));
     setSelectedBucket(updatedBucket);
     setNewQuery('');
   };
@@ -120,11 +92,7 @@ export default function Home() {
       ...selectedBucket,
       queries: selectedBucket.queries.filter((q) => q !== query),
     };
-    setBuckets(
-      buckets.map((b) =>
-        b.id === selectedBucket.id ? updatedBucket : b
-      )
-    );
+    setBuckets(buckets.map((b) => b.id === selectedBucket.id ? updatedBucket : b));
     setSelectedBucket(updatedBucket);
   };
 
@@ -138,8 +106,7 @@ export default function Home() {
   };
 
   // Combine all tweets from all queries and apply client-side filters
-  // Return empty array if we're changing buckets to clear old data
-  const allTweets = isChangingBucket ? [] : results
+  const allTweets = results
     .filter((r) => r.isSuccess && r.data?.data)
     .flatMap((r) => r.data.data.map(tweet => ({
       ...tweet,
@@ -151,13 +118,12 @@ export default function Home() {
       return likes >= minLikes && retweets >= minRetweets;
     })
     .sort((a, b) => {
-      // Sort by engagement (likes + retweets)
       const aScore = (a.public_metrics?.like_count || 0) + (a.public_metrics?.retweet_count || 0);
       const bScore = (b.public_metrics?.like_count || 0) + (b.public_metrics?.retweet_count || 0);
       return bScore - aScore;
     });
 
-  const isLoading = isChangingBucket || results.some((r) => r.isLoading);
+  const isLoading = results.some((r) => r.isLoading);
   const hasErrors = results.some((r) => r.isError);
 
   return (
@@ -173,7 +139,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Query Syntax Helper */}
         {showSyntaxHelper && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <h3 className="font-semibold mb-2">Supported Query Operators</h3>
@@ -355,7 +320,6 @@ export default function Home() {
 
           {/* Main Content */}
           <div className="md:col-span-3 space-y-6">
-            {/* Query Management */}
             {selectedBucket && (
               <div className="bg-white rounded-lg p-4 shadow">
                 <h2 className="text-xl font-semibold mb-4">
@@ -398,16 +362,10 @@ export default function Home() {
               </div>
             )}
 
-            {/* Tweet Display */}
             {selectedBucket && (
               <div>
                 <h2 className="text-xl font-semibold mb-4">
                   Posts ({allTweets.length})
-                  {(minLikes > 0 || minRetweets > 0) && (
-                    <span className="text-sm text-gray-500 ml-2">
-                      (filtered client-side)
-                    </span>
-                  )}
                 </h2>
 
                 {hasErrors && (
@@ -420,7 +378,7 @@ export default function Home() {
 
                 {isLoading && (
                   <div className="text-center py-8 text-gray-500">
-                    Loading tweets from {selectedBucket.queries.length} queries...
+                    Loading tweets...
                   </div>
                 )}
 
