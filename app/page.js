@@ -51,13 +51,14 @@ export default function Home() {
   // Fetch tweets for all queries in selected bucket
   const queries = selectedBucket
     ? selectedBucket.queries.map((query) => ({
-        queryKey: ['tweets', query, startDate, endDate],
+        queryKey: ['tweets', selectedBucket.id, query, startDate, endDate],
         queryFn: async () => {
           const res = await fetch(buildApiUrl(query));
           if (!res.ok) throw new Error('Failed to fetch');
           return res.json();
         },
         enabled: !!selectedBucket,
+        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
       }))
     : [];
 
