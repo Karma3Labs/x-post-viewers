@@ -6,6 +6,8 @@ import { useQueries } from '@tanstack/react-query';
 export default function Home() {
   const [buckets, setBuckets] = useState([]);
   const [selectedBucket, setSelectedBucket] = useState(null);
+  const [currentBucketId, setCurrentBucketId] = useState(null);
+  const [isChangingBucket, setIsChangingBucket] = useState(false);
   const [newBucketName, setNewBucketName] = useState('');
   const [newQuery, setNewQuery] = useState('');
   const [showAddBucket, setShowAddBucket] = useState(false);
@@ -16,6 +18,22 @@ export default function Home() {
   const [endDate, setEndDate] = useState('');
   const [minLikes, setMinLikes] = useState(0);
   const [minRetweets, setMinRetweets] = useState(0);
+
+  // Handle bucket change with cleanup
+  useEffect(() => {
+    if (selectedBucket && selectedBucket.id !== currentBucketId) {
+      console.log('🔄 Bucket changed:', currentBucketId, '→', selectedBucket.id);
+      setIsChangingBucket(true);
+      setCurrentBucketId(selectedBucket.id);
+
+      // Small delay to ensure old queries are cleared
+      const timer = setTimeout(() => {
+        setIsChangingBucket(false);
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [selectedBucket, currentBucketId]);
 
   // Load buckets from server on mount
   useEffect(() => {
@@ -49,17 +67,19 @@ export default function Home() {
   };
 
   // Fetch tweets for all queries in selected bucket
-  const queries = selectedBucket
+  // Only create queries when we're not changing buckets
+  const queries = selectedBucket && !isChangingBucket && currentBucketId === selectedBucket.id
     ? selectedBucket.queries.map((query) => ({
-        queryKey: ['tweets', selectedBucket.id, query, startDate, endDate],
+        queryKey: ['tweets', currentBucketId, query, startDate, endDate],
         queryFn: async () => {
+          console.log('📡 Fetching for bucket', currentBucketId, 'query:', query.substring(0, 50) + '...');
           const res = await fetch(buildApiUrl(query));
           if (!res.ok) throw new Error('Failed to fetch');
           return res.json();
         },
-        enabled: !!selectedBucket && selectedBucket.queries.length > 0,
+        enabled: true,
         staleTime: 0, // Always fetch fresh
-        cacheTime: 1000 * 60 * 5, // Cache for 5 minutes but always check freshness
+        cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
       }))
     : [];
 
@@ -118,7 +138,8 @@ export default function Home() {
   };
 
   // Combine all tweets from all queries and apply client-side filters
-  const allTweets = results
+  // Return empty array if we're changing buckets to clear old data
+  const allTweets = isChangingBucket ? [] : results
     .filter((r) => r.isSuccess && r.data?.data)
     .flatMap((r) => r.data.data.map(tweet => ({
       ...tweet,
@@ -136,7 +157,7 @@ export default function Home() {
       return bScore - aScore;
     });
 
-  const isLoading = results.some((r) => r.isLoading);
+  const isLoading = isChangingBucket || results.some((r) => r.isLoading);
   const hasErrors = results.some((r) => r.isError);
 
   return (
