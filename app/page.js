@@ -1,15 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useQueries } from '@tanstack/react-query';
+import { useQueries, useQueryClient } from '@tanstack/react-query';
 
 export default function Home() {
+  const queryClient = useQueryClient();
   const [buckets, setBuckets] = useState([]);
   const [selectedBucket, setSelectedBucket] = useState(null);
   const [newBucketName, setNewBucketName] = useState('');
   const [newQuery, setNewQuery] = useState('');
   const [showAddBucket, setShowAddBucket] = useState(false);
   const [showSyntaxHelper, setShowSyntaxHelper] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Filters
   const [startDate, setStartDate] = useState('');
@@ -51,18 +53,25 @@ export default function Home() {
   // Fetch tweets for all queries in selected bucket
   const queries = selectedBucket
     ? selectedBucket.queries.map((query) => ({
-        queryKey: ['tweets', selectedBucket.id, query, startDate, endDate],
+        queryKey: ['tweets', selectedBucket.id, query, startDate, endDate, refreshKey],
         queryFn: async () => {
           const res = await fetch(buildApiUrl(query));
           if (!res.ok) throw new Error('Failed to fetch');
           return res.json();
         },
-        enabled: !!selectedBucket,
-        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+        enabled: !!selectedBucket && selectedBucket.queries.length > 0,
+        staleTime: 0, // Always fetch fresh
+        cacheTime: 0, // Don't cache
       }))
     : [];
 
   const results = useQueries({ queries });
+
+  // Manual refresh function
+  const handleRefresh = () => {
+    queryClient.clear(); // Clear all cache
+    setRefreshKey(prev => prev + 1); // Force new queries
+  };
 
   // Add new bucket
   const addBucket = () => {
@@ -143,12 +152,20 @@ export default function Home() {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">X Post Viewer</h1>
-          <button
-            onClick={() => setShowSyntaxHelper(!showSyntaxHelper)}
-            className="text-sm bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
-          >
-            {showSyntaxHelper ? 'Hide' : 'Show'} Query Syntax
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleRefresh}
+              className="text-sm bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              🔄 Clear Cache & Refresh
+            </button>
+            <button
+              onClick={() => setShowSyntaxHelper(!showSyntaxHelper)}
+              className="text-sm bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
+            >
+              {showSyntaxHelper ? 'Hide' : 'Show'} Query Syntax
+            </button>
+          </div>
         </div>
 
         {/* Query Syntax Helper */}
