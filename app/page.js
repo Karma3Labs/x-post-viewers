@@ -9,12 +9,23 @@ export default function Home() {
   const [newBucketName, setNewBucketName] = useState('');
   const [newQuery, setNewQuery] = useState('');
   const [showAddBucket, setShowAddBucket] = useState(false);
+  const [showSyntaxHelper, setShowSyntaxHelper] = useState(false);
+
+  // Filters
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [minLikes, setMinLikes] = useState(0);
+  const [minRetweets, setMinRetweets] = useState(0);
 
   // Load buckets from server on mount
   useEffect(() => {
     fetch('/api/buckets')
       .then(res => res.json())
-      .then(data => setBuckets(data))
+      .then(data => {
+        setBuckets(data);
+        // Auto-select first bucket if available
+        if (data.length > 0) setSelectedBucket(data[0]);
+      })
       .catch(err => console.error('Failed to load buckets:', err));
   }, []);
 
@@ -29,12 +40,20 @@ export default function Home() {
     }
   }, [buckets]);
 
+  // Build API URL with filters
+  const buildApiUrl = (query) => {
+    const params = new URLSearchParams({ query });
+    if (startDate) params.append('start_time', new Date(startDate).toISOString());
+    if (endDate) params.append('end_time', new Date(endDate).toISOString());
+    return `/api/search?${params}`;
+  };
+
   // Fetch tweets for all queries in selected bucket
   const queries = selectedBucket
     ? selectedBucket.queries.map((query) => ({
-        queryKey: ['tweets', query],
+        queryKey: ['tweets', query, startDate, endDate],
         queryFn: async () => {
-          const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+          const res = await fetch(buildApiUrl(query));
           if (!res.ok) throw new Error('Failed to fetch');
           return res.json();
         },
@@ -60,129 +79,254 @@ export default function Home() {
   // Add query to selected bucket
   const addQueryToBucket = () => {
     if (!newQuery.trim() || !selectedBucket) return;
-    setBuckets(
-      buckets.map((b) =>
-        b.id === selectedBucket.id
-          ? { ...b, queries: [...b.queries, newQuery] }
-          : b
-      )
-    );
-    setSelectedBucket({
+    const updatedBucket = {
       ...selectedBucket,
       queries: [...selectedBucket.queries, newQuery],
-    });
+    };
+    setBuckets(
+      buckets.map((b) =>
+        b.id === selectedBucket.id ? updatedBucket : b
+      )
+    );
+    setSelectedBucket(updatedBucket);
     setNewQuery('');
   };
 
   // Remove query from bucket
   const removeQuery = (query) => {
-    setBuckets(
-      buckets.map((b) =>
-        b.id === selectedBucket.id
-          ? { ...b, queries: b.queries.filter((q) => q !== query) }
-          : b
-      )
-    );
-    setSelectedBucket({
+    const updatedBucket = {
       ...selectedBucket,
       queries: selectedBucket.queries.filter((q) => q !== query),
-    });
+    };
+    setBuckets(
+      buckets.map((b) =>
+        b.id === selectedBucket.id ? updatedBucket : b
+      )
+    );
+    setSelectedBucket(updatedBucket);
   };
 
   // Delete bucket
   const deleteBucket = (id) => {
-    setBuckets(buckets.filter((b) => b.id !== id));
-    if (selectedBucket?.id === id) setSelectedBucket(null);
+    const newBuckets = buckets.filter((b) => b.id !== id);
+    setBuckets(newBuckets);
+    if (selectedBucket?.id === id) {
+      setSelectedBucket(newBuckets.length > 0 ? newBuckets[0] : null);
+    }
   };
 
-  // Combine all tweets from all queries
+  // Combine all tweets from all queries and apply client-side filters
   const allTweets = results
     .filter((r) => r.isSuccess && r.data?.data)
     .flatMap((r) => r.data.data.map(tweet => ({
       ...tweet,
       author: r.data.includes?.users?.find(u => u.id === tweet.author_id)
-    })));
+    })))
+    .filter(tweet => {
+      const likes = tweet.public_metrics?.like_count || 0;
+      const retweets = tweet.public_metrics?.retweet_count || 0;
+      return likes >= minLikes && retweets >= minRetweets;
+    })
+    .sort((a, b) => {
+      // Sort by engagement (likes + retweets)
+      const aScore = (a.public_metrics?.like_count || 0) + (a.public_metrics?.retweet_count || 0);
+      const bScore = (b.public_metrics?.like_count || 0) + (b.public_metrics?.retweet_count || 0);
+      return bScore - aScore;
+    });
 
   const isLoading = results.some((r) => r.isLoading);
+  const hasErrors = results.some((r) => r.isError);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">X Post Viewer</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">X Post Viewer</h1>
+          <button
+            onClick={() => setShowSyntaxHelper(!showSyntaxHelper)}
+            className="text-sm bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
+          >
+            {showSyntaxHelper ? 'Hide' : 'Show'} Query Syntax
+          </button>
+        </div>
+
+        {/* Query Syntax Helper */}
+        {showSyntaxHelper && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold mb-2">Supported Query Operators</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+              <div><code>from:username</code> - from user</div>
+              <div><code>to:username</code> - replies to user</div>
+              <div><code>#hashtag</code> - has hashtag</div>
+              <div><code>"exact phrase"</code> - exact match</div>
+              <div><code>keyword OR other</code> - either word</div>
+              <div><code>-word</code> - exclude word</div>
+              <div><code>lang:en</code> - language</div>
+              <div><code>is:retweet</code> - only retweets</div>
+              <div><code>-is:retweet</code> - no retweets</div>
+              <div><code>is:reply</code> - only replies</div>
+              <div><code>is:quote</code> - quote tweets</div>
+              <div><code>has:media</code> - has images/videos</div>
+              <div><code>has:links</code> - has URLs</div>
+              <div><code>has:hashtags</code> - has hashtags</div>
+            </div>
+            <p className="text-xs text-gray-600 mt-2">
+              ⚠️ Note: min_faves, min_retweets, since/until are NOT API operators.
+              Use date filters and engagement filters in the UI instead.
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Sidebar: Bucket Management */}
-          <div className="md:col-span-1 bg-white rounded-lg p-4 shadow h-fit">
-            <h2 className="text-xl font-semibold mb-4">Buckets</h2>
+          <div className="md:col-span-1 space-y-4">
+            <div className="bg-white rounded-lg p-4 shadow">
+              <h2 className="text-xl font-semibold mb-4">Buckets</h2>
 
-            <div className="space-y-2 mb-4">
-              {buckets.map((bucket) => (
-                <div
-                  key={bucket.id}
-                  className={`p-3 rounded cursor-pointer border ${
-                    selectedBucket?.id === bucket.id
-                      ? 'bg-blue-50 border-blue-300'
-                      : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
-                  }`}
-                  onClick={() => setSelectedBucket(bucket)}
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">{bucket.name}</div>
-                      <div className="text-sm text-gray-500">
-                        {bucket.queries.length} queries
+              <div className="space-y-2 mb-4">
+                {buckets.map((bucket) => (
+                  <div
+                    key={bucket.id}
+                    className={`p-3 rounded cursor-pointer border ${
+                      selectedBucket?.id === bucket.id
+                        ? 'bg-blue-50 border-blue-300'
+                        : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                    }`}
+                    onClick={() => setSelectedBucket(bucket)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="font-medium">{bucket.name}</div>
+                        <div className="text-sm text-gray-500">
+                          {bucket.queries.length} queries
+                        </div>
                       </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteBucket(bucket.id);
+                        }}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        ×
+                      </button>
                     </div>
+                  </div>
+                ))}
+              </div>
+
+              {showAddBucket ? (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    placeholder="Bucket name"
+                    value={newBucketName}
+                    onChange={(e) => setNewBucketName(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addBucket()}
+                    className="w-full px-3 py-2 border rounded"
+                    autoFocus
+                  />
+                  <div className="flex gap-2">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteBucket(bucket.id);
-                      }}
-                      className="text-red-500 hover:text-red-700 text-sm"
+                      onClick={addBucket}
+                      className="flex-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                     >
-                      ×
+                      Add
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowAddBucket(false);
+                        setNewBucketName('');
+                      }}
+                      className="flex-1 bg-gray-300 px-3 py-1 rounded hover:bg-gray-400"
+                    >
+                      Cancel
                     </button>
                   </div>
                 </div>
-              ))}
+              ) : (
+                <button
+                  onClick={() => setShowAddBucket(true)}
+                  className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  + New Bucket
+                </button>
+              )}
             </div>
 
-            {showAddBucket ? (
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="Bucket name"
-                  value={newBucketName}
-                  onChange={(e) => setNewBucketName(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && addBucket()}
-                  className="w-full px-3 py-2 border rounded"
-                  autoFocus
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={addBucket}
-                    className="flex-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                  >
-                    Add
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowAddBucket(false);
-                      setNewBucketName('');
-                    }}
-                    className="flex-1 bg-gray-300 px-3 py-1 rounded hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
+            {/* Filters */}
+            {selectedBucket && (
+              <div className="bg-white rounded-lg p-4 shadow">
+                <h3 className="font-semibold mb-3">Filters</h3>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Start Date</label>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full px-2 py-1 border rounded text-sm"
+                      max={new Date().toISOString().split('T')[0]}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">End Date</label>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full px-2 py-1 border rounded text-sm"
+                      max={new Date().toISOString().split('T')[0]}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Min Likes: {minLikes}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1000"
+                      step="10"
+                      value={minLikes}
+                      onChange={(e) => setMinLikes(Number(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Min Retweets: {minRetweets}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="500"
+                      step="5"
+                      value={minRetweets}
+                      onChange={(e) => setMinRetweets(Number(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+
+                  {(startDate || endDate || minLikes > 0 || minRetweets > 0) && (
+                    <button
+                      onClick={() => {
+                        setStartDate('');
+                        setEndDate('');
+                        setMinLikes(0);
+                        setMinRetweets(0);
+                      }}
+                      className="w-full text-sm text-red-600 hover:text-red-800"
+                    >
+                      Clear Filters
+                    </button>
+                  )}
                 </div>
               </div>
-            ) : (
-              <button
-                onClick={() => setShowAddBucket(true)}
-                className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                + New Bucket
-              </button>
             )}
           </div>
 
@@ -198,7 +342,7 @@ export default function Home() {
                 <div className="flex gap-2 mb-4">
                   <input
                     type="text"
-                    placeholder="Add query (e.g., from:elonmusk)"
+                    placeholder="Add query (e.g., from:elonmusk -is:retweet)"
                     value={newQuery}
                     onChange={(e) => setNewQuery(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && addQueryToBucket()}
@@ -218,10 +362,10 @@ export default function Home() {
                       key={idx}
                       className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2"
                     >
-                      <span className="text-sm">{query}</span>
+                      <span className="text-sm font-mono">{query}</span>
                       <button
                         onClick={() => removeQuery(query)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-red-500 hover:text-red-700 font-bold"
                       >
                         ×
                       </button>
@@ -236,11 +380,24 @@ export default function Home() {
               <div>
                 <h2 className="text-xl font-semibold mb-4">
                   Posts ({allTweets.length})
+                  {(minLikes > 0 || minRetweets > 0) && (
+                    <span className="text-sm text-gray-500 ml-2">
+                      (filtered client-side)
+                    </span>
+                  )}
                 </h2>
+
+                {hasErrors && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <p className="text-red-800 text-sm">
+                      ⚠️ Some queries failed. Check your X_BEARER_TOKEN or query syntax.
+                    </p>
+                  </div>
+                )}
 
                 {isLoading && (
                   <div className="text-center py-8 text-gray-500">
-                    Loading tweets...
+                    Loading tweets from {selectedBucket.queries.length} queries...
                   </div>
                 )}
 
@@ -263,15 +420,21 @@ export default function Home() {
                             <span className="font-bold">
                               {tweet.author?.name || 'Unknown'}
                             </span>
+                            {tweet.author?.verified && (
+                              <span className="text-blue-500">✓</span>
+                            )}
                             <span className="text-gray-500 text-sm">
                               @{tweet.author?.username || 'unknown'}
                             </span>
                           </div>
-                          <p className="text-gray-800 mb-2">{tweet.text}</p>
+                          <p className="text-gray-800 mb-2 whitespace-pre-wrap">{tweet.text}</p>
                           <div className="flex gap-4 text-sm text-gray-500">
                             <span>❤️ {tweet.public_metrics?.like_count || 0}</span>
                             <span>🔁 {tweet.public_metrics?.retweet_count || 0}</span>
                             <span>💬 {tweet.public_metrics?.reply_count || 0}</span>
+                            <span className="text-xs text-gray-400">
+                              {new Date(tweet.created_at).toLocaleDateString()}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -281,7 +444,7 @@ export default function Home() {
 
                 {!isLoading && allTweets.length === 0 && selectedBucket.queries.length > 0 && (
                   <div className="text-center py-8 text-gray-500">
-                    No tweets found
+                    No tweets found matching your filters
                   </div>
                 )}
 

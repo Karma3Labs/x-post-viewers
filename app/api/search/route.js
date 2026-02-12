@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('query');
+  const startTime = searchParams.get('start_time');
+  const endTime = searchParams.get('end_time');
 
   if (!query) {
     return NextResponse.json({ error: 'Query is required' }, { status: 400 });
@@ -20,11 +22,15 @@ export async function GET(request) {
   try {
     const params = new URLSearchParams({
       query: query,
-      max_results: '20',
+      max_results: '100',
       'tweet.fields': 'created_at,author_id,public_metrics,text',
       'expansions': 'author_id',
-      'user.fields': 'name,username,profile_image_url'
+      'user.fields': 'name,username,profile_image_url,verified'
     });
+
+    // Add optional date range
+    if (startTime) params.append('start_time', startTime);
+    if (endTime) params.append('end_time', endTime);
 
     const response = await fetch(
       `https://api.x.com/2/tweets/search/recent?${params}`,

@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "id": 1,
+    "name": "Crypto",
+    "queries": [
+      "(BTC OR Bitcoin) -is:retweet lang:en",
+      "(ETH OR Ethereum) -is:retweet lang:en",
+      "#crypto has:links -is:retweet lang:en"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Sports",
+    "queries": [
+      "(NBA OR basketball) -is:retweet lang:en",
+      "(NFL OR football) -is:retweet lang:en",
+      "#sports has:media -is:retweet lang:en"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Politics",
+    "queries": [
+      "(politics OR election) -is:retweet lang:en",
+      "(congress OR senate) -is:retweet lang:en",
+      "#policy has:links -is:retweet lang:en"
+    ]
+  }
+]
