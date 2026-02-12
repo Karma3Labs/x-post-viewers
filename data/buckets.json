@@ -3,48 +3,48 @@
     "id": 1,
     "name": "Crypto",
     "queries": [
-      "Polymarket (BTC OR Bitcoin) (price OR prediction OR \"will hit\" OR odds OR \"price target\") lang:en -is:retweet",
-      "Polymarket (ETH OR Ethereum) (price OR prediction OR \"will hit\" OR odds OR \"price target\") lang:en -is:retweet",
-      "Polymarket (SOL OR Solana) (price OR prediction OR \"will hit\" OR odds OR \"price target\") lang:en -is:retweet",
-      "(\"prediction market\" OR Polymarket OR Kalshi) (BTC OR Bitcoin OR ETH OR Ethereum OR SOL OR Solana) (thesis OR \"price prediction\" OR \"price target\" OR \"bull case\" OR \"bear case\") lang:en -is:retweet",
-      "(BTC OR Bitcoin) (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\") (price OR prediction OR 2025 OR 2026) lang:en -is:retweet",
-      "(ETH OR Ethereum) (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\") (price OR prediction OR 2025 OR 2026) lang:en -is:retweet",
-      "(SOL OR Solana) (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\") (price OR prediction OR 2025 OR 2026) lang:en -is:retweet",
-      "(\"BTC to $\" OR \"Bitcoin to $\" OR \"ETH to $\" OR \"Ethereum to $\" OR \"SOL to $\" OR \"Solana to $\") (prediction OR thesis OR \"will reach\" OR target) lang:en -is:retweet",
-      "(BTC OR ETH OR SOL OR Bitcoin OR Ethereum OR Solana) (\"price prediction\" OR \"price forecast\" OR \"price target\" OR thesis) lang:en has:links -is:retweet",
-      "(\"prediction market\" OR Polymarket) (BTC OR ETH OR SOL) (influence OR sentiment OR \"price action\" OR \"will move\" OR odds) lang:en -is:retweet"
+      "Polymarket (BTC OR Bitcoin) (price OR prediction OR \"will hit\" OR odds OR \"price target\") -NBA -Olympics -Trump -election -midterms lang:en -is:retweet",
+      "Polymarket (ETH OR Ethereum) (price OR prediction OR \"will hit\" OR odds OR \"price target\") -NBA -Olympics -Trump -election -midterms lang:en -is:retweet",
+      "Polymarket (SOL OR Solana) (price OR prediction OR \"will hit\" OR odds OR \"price target\") -NBA -Olympics -Trump -election -midterms lang:en -is:retweet",
+      "(BTC OR Bitcoin OR ETH OR Ethereum OR SOL OR Solana) (\"prediction market\" OR Polymarket OR Kalshi) (thesis OR \"price prediction\" OR \"price target\" OR \"bull case\" OR \"bear case\") -NBA -Olympics -Trump -election lang:en -is:retweet",
+      "(BTC OR Bitcoin) (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\") (price OR prediction OR 2025 OR 2026) -NBA -Olympics -Trump -election lang:en -is:retweet",
+      "(ETH OR Ethereum) (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\") (price OR prediction OR 2025 OR 2026) -NBA -Olympics -Trump -election lang:en -is:retweet",
+      "(SOL OR Solana) (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\") (price OR prediction OR 2025 OR 2026) -NBA -Olympics -Trump -election lang:en -is:retweet",
+      "(\"BTC to $\" OR \"Bitcoin to $\" OR \"ETH to $\" OR \"Ethereum to $\" OR \"SOL to $\" OR \"Solana to $\") (prediction OR thesis OR \"will reach\" OR target) -NBA -Trump lang:en -is:retweet",
+      "(BTC OR ETH OR SOL OR Bitcoin OR Ethereum OR Solana) (\"price prediction\" OR \"price forecast\" OR \"price target\" OR thesis) -NBA -Olympics -Trump -election lang:en has:links -is:retweet",
+      "(BTC OR ETH OR SOL OR Bitcoin OR Ethereum OR Solana) (\"prediction market\" OR Polymarket) (influence OR sentiment OR \"price action\" OR \"will move\" OR odds) -NBA -Trump lang:en -is:retweet"
     ]
   },
   {
     "id": 2,
     "name": "Sports",
     "queries": [
-      "Polymarket (NBA OR \"NBA Champion\" OR \"2026 NBA\") (odds OR prediction OR \"will win\" OR \"price target\" OR thesis) lang:en -is:retweet",
-      "Polymarket (\"Winter Olympics\" OR \"Milano Cortina\" OR Olympics) (gold OR medal OR winner OR \"will win\" OR odds) lang:en -is:retweet",
-      "Polymarket (\"Premier League\" OR EPL OR \"Champions League\" OR \"La Liga\") (winner OR prediction OR odds OR \"will win\") lang:en -is:retweet",
-      "(\"prediction market\" OR Polymarket OR Kalshi) (NBA OR Olympics OR \"Winter Olympics\" OR NHL OR soccer OR EPL) (thesis OR \"bull case\" OR \"bear case\" OR prediction OR \"my take\") lang:en -is:retweet",
-      "(NBA OR \"NBA Champion\" OR Thunder OR Celtics OR \"2026 NBA\") (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\" OR prediction) lang:en -is:retweet",
-      "(\"Winter Olympics\" OR \"Milano Cortina\" OR Olympics) (gold OR medal OR \"will win\" OR thesis OR prediction OR \"dark horse\") lang:en -is:retweet",
-      "(EPL OR \"Premier League\" OR Arsenal OR \"Champions League\") (\"my thesis\" OR \"bull case\" OR \"bear case\" OR \"title prediction\" OR \"will win\") lang:en -is:retweet",
-      "(\"NBA Champion\" OR \"Olympic gold\" OR \"EPL winner\" OR \"Stanley Cup\" OR \"Super Bowl next year\") (prediction OR thesis OR \"will win\" OR odds OR target) lang:en -is:retweet",
-      "(NBA OR Olympics OR Polymarket OR Kalshi) (\"sports prediction\" OR \"odds movement\" OR thesis OR forecast OR \"will win\") lang:en has:links -is:retweet",
-      "(\"prediction market\" OR Polymarket OR Kalshi) (NBA OR Olympics OR soccer OR NHL) (influence OR sentiment OR \"moving the line\" OR odds OR \"price action\") lang:en -is:retweet"
+      "Polymarket (NBA OR \"NBA Champion\" OR \"2026 NBA\") (odds OR prediction OR \"will win\" OR thesis) -BTC -Bitcoin -ETH -Ethereum -SOL -Solana -crypto -Trump -election -midterms lang:en -is:retweet",
+      "Polymarket (\"Winter Olympics\" OR \"Milano Cortina\" OR Olympics) (gold OR medal OR winner OR \"will win\" OR odds) -BTC -Bitcoin -ETH -Ethereum -SOL -crypto -Trump -election lang:en -is:retweet",
+      "Polymarket (\"Premier League\" OR EPL OR \"Champions League\" OR \"La Liga\") (winner OR prediction OR odds OR \"will win\") -BTC -Bitcoin -ETH -crypto -Trump -election lang:en -is:retweet",
+      "(NBA OR Olympics OR \"Winter Olympics\" OR NHL OR soccer OR EPL) (\"prediction market\" OR Polymarket OR Kalshi) (thesis OR \"bull case\" OR \"bear case\" OR prediction OR \"my take\") -BTC -Bitcoin -ETH -Solana -crypto -Trump lang:en -is:retweet",
+      "(NBA OR \"NBA Champion\" OR Thunder OR Celtics OR \"2026 NBA\") (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR prediction) -BTC -Bitcoin -crypto -Trump -election lang:en -is:retweet",
+      "(\"Winter Olympics\" OR \"Milano Cortina\" OR Olympics) (gold OR medal OR \"will win\" OR thesis OR prediction OR \"dark horse\") -BTC -Bitcoin -crypto -Trump lang:en -is:retweet",
+      "(EPL OR \"Premier League\" OR Arsenal OR \"Champions League\") (\"my thesis\" OR \"bull case\" OR \"bear case\" OR \"title prediction\" OR \"will win\") -BTC -crypto -Trump lang:en -is:retweet",
+      "(\"NBA Champion\" OR \"Olympic gold\" OR \"EPL winner\" OR \"Stanley Cup\" OR \"Super Bowl\") (prediction OR thesis OR \"will win\" OR odds OR target) -BTC -Bitcoin -crypto -Trump lang:en -is:retweet",
+      "(NBA OR Olympics) (\"sports prediction\" OR \"odds movement\" OR thesis OR forecast OR \"will win\") -BTC -Bitcoin -ETH -Solana -crypto -Trump -election lang:en has:links -is:retweet",
+      "(NBA OR Olympics OR soccer OR NHL) (\"prediction market\" OR Polymarket OR Kalshi) (influence OR sentiment OR \"moving the line\" OR odds) -BTC -Bitcoin -crypto -Trump lang:en -is:retweet"
     ]
   },
   {
     "id": 3,
     "name": "Politics",
     "queries": [
-      "Polymarket (\"2026 midterms\" OR \"House 2026\" OR \"win the House\") (odds OR prediction OR \"will win\" OR Democrat OR Republican) lang:en -is:retweet",
-      "Polymarket (Trump) (\"Fed Chair\" OR impeachment OR \"out before 2027\" OR \"Truth Social\" OR approval OR pardon) (odds OR prediction OR \"will happen\") lang:en -is:retweet",
-      "Polymarket (Iran OR Ukraine OR Venezuela OR \"ceasefire\" OR \"strike on\") (prediction OR odds OR \"by 2026\" OR \"will happen\") lang:en -is:retweet",
-      "(\"prediction market\" OR Polymarket OR Kalshi) (midterms OR Trump OR \"2026 election\" OR Iran OR Ukraine OR tariffs OR deportations) (thesis OR \"bull case\" OR \"bear case\" OR \"my prediction\") lang:en -is:retweet",
-      "(\"2026 midterms\" OR \"House 2026\" OR \"Senate 2026\") (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\" OR prediction) lang:en -is:retweet",
-      "(Trump) (\"my thesis\" OR \"bull case\" OR \"bear case\" OR \"presidency thesis\") (2026 OR impeachment OR approval OR \"second term\") lang:en -is:retweet",
-      "(Iran OR Ukraine OR \"Russia ceasefire\" OR Venezuela OR tariffs OR deportations) (\"my thesis\" OR \"bull case\" OR \"bear case\" OR prediction OR \"will happen\") lang:en -is:retweet",
-      "(\"Democrats win House\" OR \"Republicans hold Senate\" OR \"Trump impeached\" OR \"ceasefire by\" OR \"strike Iran\" OR \"Venezuela leader\" OR \"Fed Chair\") (prediction OR thesis OR \"will\" OR odds) lang:en -is:retweet",
-      "(midterms OR Trump OR \"2026 election\" OR Polymarket) (\"price prediction\" OR \"political prediction\" OR thesis OR \"odds are\" OR forecast) lang:en has:links -is:retweet",
-      "(\"prediction market\" OR Polymarket OR Kalshi) (Trump OR midterms OR Iran OR Ukraine) (influence OR sentiment OR \"moving markets\" OR \"will affect\" OR \"price action\") lang:en -is:retweet"
+      "Polymarket (\"2026 midterms\" OR \"House 2026\" OR \"win the House\" OR Senate) (odds OR prediction OR \"will win\" OR Democrat OR Republican) -BTC -Bitcoin -ETH -Ethereum -SOL -Solana -crypto -XRP -NBA -Olympics lang:en -is:retweet",
+      "Polymarket (Trump) (\"Fed Chair\" OR impeachment OR \"out before 2027\" OR \"Truth Social\" OR approval OR pardon) (odds OR prediction OR \"will happen\") -BTC -Bitcoin -ETH -Ethereum -SOL -Solana -crypto -NBA -Olympics lang:en -is:retweet",
+      "Polymarket (Iran OR Ukraine OR Venezuela OR \"ceasefire\" OR \"strike on\") (prediction OR odds OR \"by 2026\" OR \"will happen\") -BTC -Bitcoin -ETH -Ethereum -SOL -Solana -crypto -NBA -Olympics lang:en -is:retweet",
+      "(midterms OR Trump OR \"2026 election\" OR Iran OR Ukraine OR tariffs OR deportations) (\"prediction market\" OR Polymarket OR Kalshi) (thesis OR \"bull case\" OR \"bear case\" OR \"my prediction\") -BTC -Bitcoin -ETH -Ethereum -SOL -Solana -crypto -XRP -NBA lang:en -is:retweet",
+      "(\"2026 midterms\" OR \"House 2026\" OR \"Senate 2026\") (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR prediction) -BTC -Bitcoin -ETH -Solana -crypto -NBA lang:en -is:retweet",
+      "(Trump) (\"my thesis\" OR \"bull case\" OR \"bear case\" OR \"presidency thesis\") (2026 OR impeachment OR approval OR \"second term\") -BTC -Bitcoin -ETH -crypto -NBA lang:en -is:retweet",
+      "(Iran OR Ukraine OR \"Russia ceasefire\" OR Venezuela OR tariffs OR deportations) (\"my thesis\" OR \"bull case\" OR \"bear case\" OR prediction OR \"will happen\") -BTC -Bitcoin -crypto -NBA lang:en -is:retweet",
+      "(\"Democrats win House\" OR \"Republicans hold Senate\" OR \"Trump impeached\" OR \"ceasefire by\" OR \"strike Iran\" OR \"Venezuela leader\" OR \"Fed Chair\") (prediction OR thesis OR \"will\" OR odds) -BTC -Bitcoin -crypto -NBA lang:en -is:retweet",
+      "(midterms OR Trump OR \"2026 election\") (\"political prediction\" OR thesis OR \"odds are\" OR forecast) -BTC -Bitcoin -ETH -Ethereum -SOL -Solana -crypto -NBA -Olympics lang:en has:links -is:retweet",
+      "(Trump OR midterms OR Iran OR Ukraine) (\"prediction market\" OR Polymarket OR Kalshi) (influence OR sentiment OR \"moving markets\" OR \"will affect\") -BTC -Bitcoin -ETH -Ethereum -SOL -Solana -crypto -XRP -NBA -Olympics lang:en -is:retweet"
     ]
   }
 ]
