@@ -28,9 +28,16 @@
     "id": 3,
     "name": "Politics",
     "queries": [
-      "(politics OR election) -is:retweet lang:en",
-      "(congress OR senate) -is:retweet lang:en",
-      "#policy has:links -is:retweet lang:en"
+      "Polymarket (\"2026 midterms\" OR \"House 2026\" OR \"win the House\") (odds OR prediction OR \"will win\" OR Democrat OR Republican) lang:en -is:retweet",
+      "Polymarket (Trump) (\"Fed Chair\" OR impeachment OR \"out before 2027\" OR \"Truth Social\" OR approval OR pardon) (odds OR prediction OR \"will happen\") lang:en -is:retweet",
+      "Polymarket (Iran OR Ukraine OR Venezuela OR \"ceasefire\" OR \"strike on\") (prediction OR odds OR \"by 2026\" OR \"will happen\") lang:en -is:retweet",
+      "(\"prediction market\" OR Polymarket OR Kalshi) (midterms OR Trump OR \"2026 election\" OR Iran OR Ukraine OR tariffs OR deportations) (thesis OR \"bull case\" OR \"bear case\" OR \"my prediction\") lang:en -is:retweet",
+      "(\"2026 midterms\" OR \"House 2026\" OR \"Senate 2026\") (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\" OR prediction) lang:en -is:retweet",
+      "(Trump) (\"my thesis\" OR \"bull case\" OR \"bear case\" OR \"presidency thesis\") (2026 OR impeachment OR approval OR \"second term\") lang:en -is:retweet",
+      "(Iran OR Ukraine OR \"Russia ceasefire\" OR Venezuela OR tariffs OR deportations) (\"my thesis\" OR \"bull case\" OR \"bear case\" OR prediction OR \"will happen\") lang:en -is:retweet",
+      "(\"Democrats win House\" OR \"Republicans hold Senate\" OR \"Trump impeached\" OR \"ceasefire by\" OR \"strike Iran\" OR \"Venezuela leader\" OR \"Fed Chair\") (prediction OR thesis OR \"will\" OR odds) lang:en -is:retweet",
+      "(midterms OR Trump OR \"2026 election\" OR Polymarket) (\"price prediction\" OR \"political prediction\" OR thesis OR \"odds are\" OR forecast) lang:en has:links -is:retweet",
+      "(\"prediction market\" OR Polymarket OR Kalshi) (Trump OR midterms OR Iran OR Ukraine) (influence OR sentiment OR \"moving markets\" OR \"will affect\" OR \"price action\") lang:en -is:retweet"
     ]
   }
 ]
