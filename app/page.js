@@ -56,10 +56,15 @@ export default function Home() {
           if (!res.ok) throw new Error('Failed to fetch');
           return res.json();
         },
+        staleTime: 0,
+        gcTime: 0, // Immediately remove from cache when query is removed
       }))
     : [];
 
   const results = useQueries({ queries });
+
+  // Only use results if we have active queries
+  const activeResults = selectedBucket?.queries.length > 0 ? results : [];
 
   // Add new bucket
   const addBucket = () => {
@@ -106,25 +111,38 @@ export default function Home() {
   };
 
   // Combine all tweets from all queries and apply client-side filters
-  const allTweets = results
-    .filter((r) => r.isSuccess && r.data?.data)
-    .flatMap((r) => r.data.data.map(tweet => ({
-      ...tweet,
-      author: r.data.includes?.users?.find(u => u.id === tweet.author_id)
-    })))
-    .filter(tweet => {
-      const likes = tweet.public_metrics?.like_count || 0;
-      const retweets = tweet.public_metrics?.retweet_count || 0;
-      return likes >= minLikes && retweets >= minRetweets;
-    })
-    .sort((a, b) => {
-      const aScore = (a.public_metrics?.like_count || 0) + (a.public_metrics?.retweet_count || 0);
-      const bScore = (b.public_metrics?.like_count || 0) + (b.public_metrics?.retweet_count || 0);
-      return bScore - aScore;
-    });
+  const allTweets = activeResults.length > 0
+    ? (() => {
+        // Collect all tweets
+        const tweets = activeResults
+          .filter((r) => r.isSuccess && r.data?.data)
+          .flatMap((r) => r.data.data.map(tweet => ({
+            ...tweet,
+            author: r.data.includes?.users?.find(u => u.id === tweet.author_id)
+          })));
 
-  const isLoading = results.some((r) => r.isLoading);
-  const hasErrors = results.some((r) => r.isError);
+        // Deduplicate by tweet ID
+        const uniqueTweets = Array.from(
+          new Map(tweets.map(tweet => [tweet.id, tweet])).values()
+        );
+
+        // Apply filters and sort
+        return uniqueTweets
+          .filter(tweet => {
+            const likes = tweet.public_metrics?.like_count || 0;
+            const retweets = tweet.public_metrics?.retweet_count || 0;
+            return likes >= minLikes && retweets >= minRetweets;
+          })
+          .sort((a, b) => {
+            const aScore = (a.public_metrics?.like_count || 0) + (a.public_metrics?.retweet_count || 0);
+            const bScore = (b.public_metrics?.like_count || 0) + (b.public_metrics?.retweet_count || 0);
+            return bScore - aScore;
+          });
+      })()
+    : [];
+
+  const isLoading = activeResults.some((r) => r.isLoading);
+  const hasErrors = activeResults.some((r) => r.isError);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
