@@ -3,9 +3,16 @@
     "id": 1,
     "name": "Crypto",
     "queries": [
-      "(BTC OR Bitcoin) -is:retweet lang:en",
-      "(ETH OR Ethereum) -is:retweet lang:en",
-      "#crypto has:links -is:retweet lang:en"
+      "Polymarket (BTC OR Bitcoin) (price OR prediction OR \"will hit\" OR odds OR \"price target\") lang:en -is:retweet",
+      "Polymarket (ETH OR Ethereum) (price OR prediction OR \"will hit\" OR odds OR \"price target\") lang:en -is:retweet",
+      "Polymarket (SOL OR Solana) (price OR prediction OR \"will hit\" OR odds OR \"price target\") lang:en -is:retweet",
+      "(\"prediction market\" OR Polymarket OR Kalshi) (BTC OR Bitcoin OR ETH OR Ethereum OR SOL OR Solana) (thesis OR \"price prediction\" OR \"price target\" OR \"bull case\" OR \"bear case\") lang:en -is:retweet",
+      "(BTC OR Bitcoin) (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\") (price OR prediction OR 2025 OR 2026) lang:en -is:retweet",
+      "(ETH OR Ethereum) (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\") (price OR prediction OR 2025 OR 2026) lang:en -is:retweet",
+      "(SOL OR Solana) (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\") (price OR prediction OR 2025 OR 2026) lang:en -is:retweet",
+      "(\"BTC to $\" OR \"Bitcoin to $\" OR \"ETH to $\" OR \"Ethereum to $\" OR \"SOL to $\" OR \"Solana to $\") (prediction OR thesis OR \"will reach\" OR target) lang:en -is:retweet",
+      "(BTC OR ETH OR SOL OR Bitcoin OR Ethereum OR Solana) (\"price prediction\" OR \"price forecast\" OR \"price target\" OR thesis) lang:en has:links -is:retweet",
+      "(\"prediction market\" OR Polymarket) (BTC OR ETH OR SOL) (influence OR sentiment OR \"price action\" OR \"will move\" OR odds) lang:en -is:retweet"
     ]
   },
   {
