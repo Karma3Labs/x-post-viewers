@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# X Post Viewer
 
-## Getting Started
+A simple Next.js app for viewing Twitter/X posts based on search queries organized in buckets.
 
-First, run the development server:
+## Setup
 
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Create a `.env.local` file with your X API credentials:
+```bash
+cp .env.local.example .env.local
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. Add your X Bearer Token to `.env.local`:
+```
+X_BEARER_TOKEN=your_actual_bearer_token
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Run the development server:
+```bash
+npm run dev
+```
 
-## Learn More
+5. Open [http://localhost:3000](http://localhost:3000)
 
-To learn more about Next.js, take a look at the following resources:
+## How to Use
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 1. Create Buckets
+- Click "+ New Bucket" in the sidebar
+- Give it a name (e.g., "Tech News", "Sports Updates")
+- Buckets are collections of search queries
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 2. Add Queries to Buckets
+- Select a bucket from the sidebar
+- Add search queries using X API query syntax
+- Examples:
+  - `from:elonmusk` - tweets from a specific user
+  - `#ai` - tweets with a hashtag
+  - `bitcoin lang:en` - tweets containing "bitcoin" in English
+  - `from:nasa OR from:spacex` - tweets from multiple users
 
-## Deploy on Vercel
+### 3. View Posts
+- Posts from all queries in the selected bucket will be fetched and displayed
+- Switch between buckets to see different sets of posts
+- Each bucket independently manages its own queries
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## X API Query Syntax
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Refer to the [X API documentation](https://docs.x.com/x-api/posts/search-all-posts) for query syntax.
+
+Common operators:
+- `from:username` - posts from a specific user
+- `to:username` - replies to a user
+- `#hashtag` - posts with a hashtag
+- `"exact phrase"` - posts with exact phrase
+- `keyword1 OR keyword2` - posts with either keyword
+- `keyword1 -keyword2` - posts with keyword1 but not keyword2
+- `lang:en` - posts in English
+
+## Features
+
+- 📦 Organize queries into buckets
+- 🔍 Multiple queries per bucket
+- 📊 Fetch from all queries in parallel
+- 💾 LocalStorage persistence
+- 🎨 Simple, clean UI
+- ⚡ Fast with TanStack Query
+
+## Tech Stack
+
+- Next.js 15 (App Router)
+- TanStack Query (React Query)
+- Tailwind CSS
+- X API v2
