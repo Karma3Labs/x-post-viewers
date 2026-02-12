@@ -19,9 +19,16 @@
     "id": 2,
     "name": "Sports",
     "queries": [
-      "(NBA OR basketball) -is:retweet lang:en",
-      "(NFL OR football) -is:retweet lang:en",
-      "#sports has:media -is:retweet lang:en"
+      "Polymarket (NBA OR \"NBA Champion\" OR \"2026 NBA\") (odds OR prediction OR \"will win\" OR \"price target\" OR thesis) lang:en -is:retweet",
+      "Polymarket (\"Winter Olympics\" OR \"Milano Cortina\" OR Olympics) (gold OR medal OR winner OR \"will win\" OR odds) lang:en -is:retweet",
+      "Polymarket (\"Premier League\" OR EPL OR \"Champions League\" OR \"La Liga\") (winner OR prediction OR odds OR \"will win\") lang:en -is:retweet",
+      "(\"prediction market\" OR Polymarket OR Kalshi) (NBA OR Olympics OR \"Winter Olympics\" OR NHL OR soccer OR EPL) (thesis OR \"bull case\" OR \"bear case\" OR prediction OR \"my take\") lang:en -is:retweet",
+      "(NBA OR \"NBA Champion\" OR Thunder OR Celtics OR \"2026 NBA\") (\"my thesis\" OR \"bull thesis\" OR \"bear thesis\" OR \"investment thesis\" OR prediction) lang:en -is:retweet",
+      "(\"Winter Olympics\" OR \"Milano Cortina\" OR Olympics) (gold OR medal OR \"will win\" OR thesis OR prediction OR \"dark horse\") lang:en -is:retweet",
+      "(EPL OR \"Premier League\" OR Arsenal OR \"Champions League\") (\"my thesis\" OR \"bull case\" OR \"bear case\" OR \"title prediction\" OR \"will win\") lang:en -is:retweet",
+      "(\"NBA Champion\" OR \"Olympic gold\" OR \"EPL winner\" OR \"Stanley Cup\" OR \"Super Bowl next year\") (prediction OR thesis OR \"will win\" OR odds OR target) lang:en -is:retweet",
+      "(NBA OR Olympics OR Polymarket OR Kalshi) (\"sports prediction\" OR \"odds movement\" OR thesis OR forecast OR \"will win\") lang:en has:links -is:retweet",
+      "(\"prediction market\" OR Polymarket OR Kalshi) (NBA OR Olympics OR soccer OR NHL) (influence OR sentiment OR \"moving the line\" OR odds OR \"price action\") lang:en -is:retweet"
     ]
   },
   {
